@@ -10,13 +10,18 @@ let
   cfg = config.services.flood;
 in
 {
-  meta.maintainers = with lib.maintainers; [ thiagokokada ];
+  meta.maintainers = with lib.maintainers; [ thiagokokada azikx ];
 
   options.services.flood = {
     enable = lib.mkEnableOption "flood";
     package = lib.mkPackageOption pkgs "flood" { };
     openFirewall = lib.mkEnableOption "" // {
       description = "Whether to open the firewall for the port in {option}`services.flood.port`.";
+    };
+    dataDir = lib.mkOption {
+      type = lib.types.str;
+      description = "Directory flood's config and db.";
+      default = "/var/lib/flood";
     };
     port = lib.mkOption {
       type = lib.types.port;
@@ -56,7 +61,8 @@ in
             cfg.host
             "--port"
             (toString cfg.port)
-            "--rundir=/var/lib/flood"
+            "--rundir"
+            cfg.dataDir
           ]
           ++ cfg.extraArgs
         );
